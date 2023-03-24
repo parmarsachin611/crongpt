@@ -72,51 +72,56 @@ const handleSubmit = async(e) => {
   e.preventDefault();
   const data = new FormData(form);
 
-  // User's Chat Stripe
-  chatContainer.innerHTML += chatStripe( false, data.get('prompt') );
-
-  form.reset();
-
-  // Bot's ChatStripe
-  const uniqueId = generateUniqueId();
-
-  chatContainer.innerHTML += chatStripe( true, " ", uniqueId );
-
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
-  const messageDiv = document.getElementById(uniqueId);
-
-  loader(messageDiv);
-
-  // fetch data from server
-  const response = await fetch("https://crongpt.onrender.com",{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt: data.get('prompt'),
-    })
-  })
-
-  clearInterval(loadInterval);
-  messageDiv.innerHTML = '';
-
-  if (response.ok) {
-    
-    const data = await response.json();
-    const parsedData = data.bot.trim();
-
-    typeText(messageDiv,parsedData);
-    
+  if (data.get('prompt') === "") {
+    alert("Enter The Question!!!")
   } else {
+    
+    // User's Chat Stripe
+    chatContainer.innerHTML += chatStripe( false, data.get('prompt') );
 
-    const err = await response.text();
+    form.reset();
 
-    messageDiv.innerHTML = "Something went wrong";
+    // Bot's ChatStripe
+    const uniqueId = generateUniqueId();
 
-    alert(err);
+    chatContainer.innerHTML += chatStripe( true, " ", uniqueId );
 
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    const messageDiv = document.getElementById(uniqueId);
+
+    loader(messageDiv);
+
+    // fetch data from server
+    const response = await fetch("https://crongpt.onrender.com",{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: data.get('prompt'),
+      })
+    })
+
+    clearInterval(loadInterval);
+    messageDiv.innerHTML = '';
+
+    if (response.ok) {
+      
+      const data = await response.json();
+      const parsedData = data.bot.trim();
+
+      typeText(messageDiv,parsedData);
+      
+    } else {
+
+      const err = await response.text();
+
+      messageDiv.innerHTML = "Something went wrong";
+
+      alert(err);
+
+    } 
   }
 
 }
